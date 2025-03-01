@@ -19,6 +19,16 @@ export class PokemonService {
     return pokemon;
   }
 
+  async findByName(name: string): Promise<Pokemon> {
+    const pokemon = await this.pokemonModel
+      .findOne({ name: { $regex: name, $options: 'i' } })
+      .exec();
+    if (!pokemon) {
+      throw new NotFoundException(`Pokemon with name ${name} not found`);
+    }
+    return pokemon;
+  }
+
   async create(pokemonData: Pokemon): Promise<Pokemon> {
     const createdPokemon = new this.pokemonModel(pokemonData);
     return createdPokemon.save();
