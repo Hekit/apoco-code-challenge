@@ -1,0 +1,15 @@
+meta {
+  name: getByName
+  type: http
+  seq: 4
+}
+
+get {
+  url: http://localhost:3000/pokemons/search?name=pikachu
+  body: none
+  auth: none
+}
+
+params:query {
+  name: pikachu
+}
