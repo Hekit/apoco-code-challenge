@@ -42,6 +42,7 @@ describe('PokemonService', () => {
     // Static methods for queries - we'll assign Jest mocks to these in our tests
     static findById = jest.fn();
     static findOne = jest.fn();
+    static find: jest.Mock;
 
     private data: Pokemon;
     constructor(data: Pokemon) {
@@ -107,6 +108,56 @@ describe('PokemonService', () => {
       await expect(service.findByName('unknown')).rejects.toThrow(
         NotFoundException,
       );
+    });
+  });
+
+  describe('findAll', () => {
+    it('should return all pokemons without filters', async () => {
+      // Assign a static "find" method for findAll.
+      FakePokemonModel.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([fakePokemon]),
+      });
+      const result = await service.findAll({});
+      expect(result).toEqual([fakePokemon]);
+      expect(FakePokemonModel.find).toHaveBeenCalledWith({});
+    });
+
+    it('should filter by name (case-insensitive)', async () => {
+      FakePokemonModel.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([fakePokemon]),
+      });
+      const result = await service.findAll({ name: 'bulb' });
+      expect(result).toEqual([fakePokemon]);
+      expect(FakePokemonModel.find).toHaveBeenCalledWith({
+        name: { $regex: 'bulb', $options: 'i' },
+      });
+    });
+
+    it('should filter by multiple types', async () => {
+      FakePokemonModel.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([fakePokemon]),
+      });
+      const result = await service.findAll({ type: 'Grass,Poison' });
+      expect(result).toEqual([fakePokemon]);
+      expect(FakePokemonModel.find).toHaveBeenCalledWith({
+        types: { $in: ['Grass', 'Poison'] },
+      });
+    });
+
+    it('should paginate results', async () => {
+      FakePokemonModel.find = jest.fn().mockReturnValue({
+        skip: jest.fn().mockReturnThis(),
+        limit: jest.fn().mockReturnThis(),
+        exec: jest.fn().mockResolvedValue([fakePokemon]),
+      });
+      const result = await service.findAll({ page: 2, limit: 5 });
+      expect(result).toEqual([fakePokemon]);
     });
   });
 

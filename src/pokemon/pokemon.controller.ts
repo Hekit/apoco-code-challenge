@@ -7,13 +7,26 @@ export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
   @Get('search')
-  async getPokemonByName(@Query('name') name: string): Promise<Pokemon> {
-    return this.pokemonService.findByName(name);
+  async getPokemons(
+    @Query()
+    query: {
+      page?: number;
+      limit?: number;
+      name?: string;
+      types?: string;
+    },
+  ): Promise<Pokemon[]> {
+    return this.pokemonService.findAll(query);
   }
 
   @Get(':id')
   async getPokemonById(@Param('id') id: number): Promise<Pokemon> {
     return this.pokemonService.findById(id);
+  }
+
+  @Get()
+  async getPokemonByName(@Query('name') name: string): Promise<Pokemon> {
+    return this.pokemonService.findByName(name);
   }
 
   @Post()

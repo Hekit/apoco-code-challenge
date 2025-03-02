@@ -1,0 +1,16 @@
+meta {
+  name: type-limit
+  type: http
+  seq: 1
+}
+
+get {
+  url: http://localhost:3000/pokemons/search?type=Grass,Water&limit=20
+  body: none
+  auth: none
+}
+
+params:query {
+  type: Grass,Water
+  limit: 20
+}

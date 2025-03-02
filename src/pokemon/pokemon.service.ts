@@ -4,6 +4,26 @@ import { Model } from 'mongoose';
 import { PokemonEntity, PokemonDocument } from './schemas/pokemon.schema';
 import { Pokemon } from './pokemon.interface';
 
+interface FindAllQuery {
+  page?: number;
+  limit?: number;
+  name?: string;
+  type?: string;
+}
+
+export interface PokemonFilter {
+  name?: {
+    $regex: string;
+    $options: string;
+  };
+  types?: {
+    $in: string[];
+  };
+  _id?: {
+    $in: string[];
+  };
+}
+
 @Injectable()
 export class PokemonService {
   constructor(
@@ -27,6 +47,31 @@ export class PokemonService {
       throw new NotFoundException(`Pokemon with name ${name} not found`);
     }
     return pokemon;
+  }
+
+  async findAll(query: FindAllQuery): Promise<Pokemon[]> {
+    const page = query.page || 1;
+    const limit = query.limit || 10;
+    const filter: PokemonFilter = {};
+
+    if (query.name) {
+      filter.name = { $regex: query.name, $options: 'i' };
+    }
+
+    if (query.type) {
+      const types = Array.isArray(query.type)
+        ? query.type
+        : query.type.split(',').map((t) => t.trim());
+      filter.types = { $in: types };
+    }
+
+    const skip = (page - 1) * limit;
+    const pokemons = await this.pokemonModel
+      .find(filter)
+      .skip(skip)
+      .limit(limit)
+      .exec();
+    return pokemons;
   }
 
   async create(pokemonData: Pokemon): Promise<Pokemon> {
