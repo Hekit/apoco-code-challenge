@@ -69,4 +69,14 @@ describe('PokemonController (e2e)', () => {
       expect(types.includes('Grass') || types.includes('Poison')).toBe(true);
     });
   });
+
+  it('GET /pokemons/types should return all distinct types', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pokemons/types')
+      .expect(200);
+    // Expect at least the types 'Grass', 'Poison', and 'Fire' from our seeded data.
+    expect(res.body).toEqual(
+      expect.arrayContaining(['Grass', 'Poison', 'Fire']),
+    );
+  });
 });

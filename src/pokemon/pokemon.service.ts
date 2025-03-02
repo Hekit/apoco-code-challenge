@@ -74,6 +74,10 @@ export class PokemonService {
     return pokemons;
   }
 
+  async getTypes(): Promise<string[]> {
+    return this.pokemonModel.distinct('types').exec();
+  }
+
   async create(pokemonData: Pokemon): Promise<Pokemon> {
     const createdPokemon = new this.pokemonModel(pokemonData);
     return createdPokemon.save();

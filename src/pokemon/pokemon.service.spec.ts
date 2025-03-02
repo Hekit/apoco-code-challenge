@@ -42,6 +42,7 @@ describe('PokemonService', () => {
     // Static methods for queries - we'll assign Jest mocks to these in our tests
     static findById = jest.fn();
     static findOne = jest.fn();
+    static distinct = jest.fn();
     static find: jest.Mock;
 
     private data: Pokemon;
@@ -158,6 +159,17 @@ describe('PokemonService', () => {
       });
       const result = await service.findAll({ page: 2, limit: 5 });
       expect(result).toEqual([fakePokemon]);
+    });
+  });
+
+  describe('getTypes', () => {
+    it('should return an array of distinct types', async () => {
+      FakePokemonModel.distinct.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(['Grass', 'Poison', 'Fire']),
+      });
+      const result = await service.getTypes();
+      expect(result).toEqual(['Grass', 'Poison', 'Fire']);
+      expect(FakePokemonModel.distinct).toHaveBeenCalledWith('types');
     });
   });
 

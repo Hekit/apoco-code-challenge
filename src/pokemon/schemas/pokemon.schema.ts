@@ -14,7 +14,7 @@ export class PokemonEntity implements Pokemon {
   @Prop()
   classification: string;
 
-  @Prop([String])
+  @Prop({ type: [String], index: true })
   types: string[];
 
   @Prop([String])

@@ -19,6 +19,11 @@ export class PokemonController {
     return this.pokemonService.findAll(query);
   }
 
+  @Get('types')
+  async getPokemonTypes(): Promise<string[]> {
+    return this.pokemonService.getTypes();
+  }
+
   @Get(':id')
   async getPokemonById(@Param('id') id: number): Promise<Pokemon> {
     return this.pokemonService.findById(id);
