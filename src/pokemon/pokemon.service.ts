@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PokemonEntity, PokemonDocument } from './schemas/pokemon.schema';
 import { Pokemon } from './pokemon.interface';
+import { PokemonType } from './pokemon-type.enum';
 
 interface FindAllQuery {
   page?: number;
@@ -59,9 +60,9 @@ export class PokemonService {
     }
 
     if (query.type) {
-      const types = Array.isArray(query.type)
-        ? query.type
-        : query.type.split(',').map((t) => t.trim());
+      const types: PokemonType[] = query.type
+        .split(',')
+        .map((t) => t.trim() as PokemonType);
       filter.types = { $in: types };
     }
 

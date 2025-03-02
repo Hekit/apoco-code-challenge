@@ -1,7 +1,7 @@
-// src/pokemon/schemas/pokemon.schema.ts
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
 import { Pokemon } from '../pokemon.interface';
+import { PokemonType } from '../pokemon-type.enum';
 
 @Schema({ collection: 'pokemons' })
 export class PokemonEntity implements Pokemon {
@@ -15,13 +15,13 @@ export class PokemonEntity implements Pokemon {
   classification: string;
 
   @Prop({ type: [String], index: true })
-  types: string[];
+  types: PokemonType[];
 
   @Prop([String])
-  resistant: string[];
+  resistant: PokemonType[];
 
   @Prop([String])
-  weaknesses: string[];
+  weaknesses: PokemonType[];
 
   @Prop({ type: Object })
   weight: { minimum: string; maximum: string };
@@ -46,8 +46,8 @@ export class PokemonEntity implements Pokemon {
 
   @Prop({ type: Object })
   attacks: {
-    fast: { name: string; type: string; damage: number }[];
-    special: { name: string; type: string; damage: number }[];
+    fast: { name: string; type: PokemonType; damage: number }[];
+    special: { name: string; type: PokemonType; damage: number }[];
   };
 }
 

@@ -1,10 +1,12 @@
+import { PokemonType } from './pokemon-type.enum';
+
 export interface Pokemon {
   _id: number;
   name: string;
   classification: string;
-  types: string[];
-  resistant: string[];
-  weaknesses: string[];
+  types: PokemonType[];
+  resistant: PokemonType[];
+  weaknesses: PokemonType[];
   weight: Weight;
   height: Height;
   fleeRate: number;
@@ -42,6 +44,6 @@ export interface Attacks {
 
 export interface Attack {
   name: string;
-  type: string;
+  type: PokemonType;
   damage: number;
 }

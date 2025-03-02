@@ -4,6 +4,7 @@ import { getModelToken } from '@nestjs/mongoose';
 import { PokemonEntity } from './schemas/pokemon.schema';
 import { NotFoundException } from '@nestjs/common';
 import { Pokemon } from './pokemon.interface';
+import { PokemonType } from './pokemon-type.enum';
 
 describe('PokemonService', () => {
   let service: PokemonService;
@@ -12,9 +13,20 @@ describe('PokemonService', () => {
     _id: 1,
     name: 'Bulbasaur',
     classification: 'Seed Pokémon',
-    types: ['Grass', 'Poison'],
-    resistant: ['Water', 'Electric', 'Grass', 'Fighting', 'Fairy'],
-    weaknesses: ['Fire', 'Ice', 'Flying', 'Psychic'],
+    types: [PokemonType.Grass, PokemonType.Poison],
+    resistant: [
+      PokemonType.Water,
+      PokemonType.Electric,
+      PokemonType.Grass,
+      PokemonType.Fighting,
+      PokemonType.Fairy,
+    ],
+    weaknesses: [
+      PokemonType.Fire,
+      PokemonType.Ice,
+      PokemonType.Flying,
+      PokemonType.Psychic,
+    ],
     weight: { minimum: '6.04kg', maximum: '7.76kg' },
     height: { minimum: '0.61m', maximum: '0.79m' },
     fleeRate: 0.1,
@@ -27,13 +39,13 @@ describe('PokemonService', () => {
     maxHP: 1071,
     attacks: {
       fast: [
-        { name: 'Tackle', type: 'Normal', damage: 12 },
-        { name: 'Vine Whip', type: 'Grass', damage: 7 },
+        { name: 'Tackle', type: PokemonType.Normal, damage: 12 },
+        { name: 'Vine Whip', type: PokemonType.Grass, damage: 7 },
       ],
       special: [
-        { name: 'Power Whip', type: 'Grass', damage: 70 },
-        { name: 'Seed Bomb', type: 'Grass', damage: 40 },
-        { name: 'Sludge Bomb', type: 'Poison', damage: 55 },
+        { name: 'Power Whip', type: PokemonType.Grass, damage: 70 },
+        { name: 'Seed Bomb', type: PokemonType.Grass, damage: 40 },
+        { name: 'Sludge Bomb', type: PokemonType.Poison, damage: 55 },
       ],
     },
   };
