@@ -23,7 +23,7 @@ import { AuthenticatedUser, User } from './user.interface';
 /**
  * Controller responsible for handling user-related requests
  */
-@ApiTags('users')
+@ApiTags('Users')
 @Controller('users')
 export class UserController {
   constructor(private readonly userService: UserService) {}
