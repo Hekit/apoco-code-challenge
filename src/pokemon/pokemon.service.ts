@@ -43,7 +43,7 @@ export class PokemonService {
 
   async findByName(name: string): Promise<Pokemon> {
     const pokemon = await this.pokemonModel
-      .findOne({ name: { $regex: name, $options: 'i' } })
+      .findOne({ name: { $regex: `^${name}$`, $options: 'i' } })
       .exec();
     if (!pokemon) {
       throw new NotFoundException(`Pokemon with name ${name} not found`);

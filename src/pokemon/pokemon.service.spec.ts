@@ -111,7 +111,7 @@ describe('PokemonService', () => {
       const result = await service.findByName('bulbasaur');
       expect(result).toEqual(mockPokemon);
       expect(FakePokemonModel.findOne).toHaveBeenCalledWith({
-        name: { $regex: 'bulbasaur', $options: 'i' },
+        name: { $regex: '^bulbasaur$', $options: 'i' },
       });
     });
 
