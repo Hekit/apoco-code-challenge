@@ -1,12 +1,13 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { INestApplication } from '@nestjs/common';
 import request from 'supertest';
-import { AppModule } from './../src/app.module';
 import { Server } from 'net';
-import { Pokemon } from 'src/pokemon/pokemon.interface';
+import { AppModule } from '../src/app.module';
+import { Pokemon } from '../src/pokemon/pokemon.interface';
 
 describe('PokemonController (e2e)', () => {
   let app: INestApplication<Server>;
+  const authHeader = 'Bearer user:password';
 
   beforeAll(async () => {
     const moduleFixture: TestingModule = await Test.createTestingModule({
@@ -43,9 +44,25 @@ describe('PokemonController (e2e)', () => {
       });
   });
 
+  it('GET /pokemons/search should fail without authentication', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pokemons/search')
+      .expect(401);
+    expect(res.unauthorized).toBeTruthy();
+  });
+
+  it('GET /pokemons/search should fail with incorrect password', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pokemons/search')
+      .set('Authorization', 'Bearer user:wrongpassword')
+      .expect(401);
+    expect(res.unauthorized).toBeTruthy();
+  });
+
   it('GET /pokemons/search should return a paginated list', async () => {
     const res = await request(app.getHttpServer())
       .get('/pokemons/search?page=1&limit=10')
+      .set('Authorization', authHeader)
       .expect(200);
     expect(Array.isArray(res.body)).toBeTruthy();
   });
@@ -53,6 +70,7 @@ describe('PokemonController (e2e)', () => {
   it('GET /pokemons/search?name=bulb should return filtered results by name', async () => {
     const res = await request(app.getHttpServer())
       .get('/pokemons/search?name=bulb')
+      .set('Authorization', authHeader)
       .expect(200);
     (res.body as Pokemon[]).forEach((pokemon: Pokemon) => {
       expect(pokemon.name.toLowerCase()).toContain('bulb');
@@ -62,6 +80,7 @@ describe('PokemonController (e2e)', () => {
   it('GET /pokemons/search?type=Grass,Poison should return pokemons matching either type', async () => {
     const res = await request(app.getHttpServer())
       .get('/pokemons/search?type=Grass,Poison')
+      .set('Authorization', authHeader)
       .expect(200);
     (res.body as Pokemon[]).forEach((pokemon: Pokemon) => {
       // Check that at least one type is in the allowed list.

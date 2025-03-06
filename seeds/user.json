@@ -1,0 +1,44 @@
+[
+  {
+    "_id": 1,
+    "username": "user",
+    "password": "password",
+    "favorites": [1, 2, 3]
+  },
+  {
+    "_id": 2,
+    "username": "no_favorite",
+    "password": "very_sad",
+    "favorites": []
+  },
+  {
+    "_id": 3,
+    "username": "ash_ketchum",
+    "password": "pikachu123",
+    "favorites": [25, 6]
+  },
+  {
+    "_id": 4,
+    "username": "misty_waterflower",
+    "password": "togepi456",
+    "favorites": [120, 54]
+  },
+  {
+    "_id": 5,
+    "username": "brock_rocksolid",
+    "password": "onix789",
+    "favorites": [95, 74]
+  },
+  {
+    "_id": 6,
+    "username": "gary_oak",
+    "password": "eevee321",
+    "favorites": [7, 1]
+  },
+  {
+    "_id": 7,
+    "username": "jessie_battle",
+    "password": "meowth000",
+    "favorites": [23, 24]
+  }
+]

@@ -1,9 +1,10 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
-import { PokemonEntity, PokemonDocument } from './schemas/pokemon.schema';
+import { PokemonEntity, PokemonDocument } from '../schemas/pokemon.schema';
 import { Pokemon } from './pokemon.interface';
 import { PokemonType } from './pokemon-type.enum';
+import { findOneOrThrow } from '../utils';
 
 interface FindAllQuery {
   page?: number;
@@ -33,11 +34,11 @@ export class PokemonService {
   ) {}
 
   async findById(id: number): Promise<Pokemon> {
-    const pokemon = await this.pokemonModel.findById(id).exec();
-    if (!pokemon) {
-      throw new NotFoundException(`Pokemon with id ${id} not found`);
-    }
-    return pokemon;
+    return findOneOrThrow(
+      this.pokemonModel,
+      { _id: id },
+      `Pokemon with id ${id} not found`,
+    );
   }
 
   async findByName(name: string): Promise<Pokemon> {

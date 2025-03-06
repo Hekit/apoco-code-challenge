@@ -1,7 +1,7 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document } from 'mongoose';
-import { Pokemon } from '../pokemon.interface';
-import { PokemonType } from '../pokemon-type.enum';
+import { Pokemon } from '../pokemon/pokemon.interface';
+import { PokemonType } from '../pokemon/pokemon-type.enum';
 
 @Schema({ collection: 'pokemons' })
 export class PokemonEntity implements Pokemon {

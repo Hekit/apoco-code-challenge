@@ -1,7 +1,7 @@
 import { Test, TestingModule } from '@nestjs/testing';
 import { PokemonService } from './pokemon.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { PokemonEntity } from './schemas/pokemon.schema';
+import { PokemonEntity } from '../schemas/pokemon.schema';
 import { NotFoundException } from '@nestjs/common';
 import { Pokemon } from './pokemon.interface';
 import { PokemonType } from './pokemon-type.enum';
@@ -9,7 +9,7 @@ import { PokemonType } from './pokemon-type.enum';
 describe('PokemonService', () => {
   let service: PokemonService;
 
-  const fakePokemon: Pokemon = {
+  const mockPokemon: Pokemon = {
     _id: 1,
     name: 'Bulbasaur',
     classification: 'Seed Pokémon',
@@ -52,7 +52,6 @@ describe('PokemonService', () => {
 
   class FakePokemonModel {
     // Static methods for queries - we'll assign Jest mocks to these in our tests
-    static findById = jest.fn();
     static findOne = jest.fn();
     static distinct = jest.fn();
     static find: jest.Mock;
@@ -86,16 +85,18 @@ describe('PokemonService', () => {
 
   describe('findById', () => {
     it('should return a pokemon if found', async () => {
-      FakePokemonModel.findById.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(fakePokemon),
+      FakePokemonModel.findOne.mockReturnValue({
+        exec: jest.fn().mockResolvedValue(mockPokemon),
       });
-      const result = await service.findById(fakePokemon._id);
-      expect(result).toEqual(fakePokemon);
-      expect(FakePokemonModel.findById).toHaveBeenCalledWith(fakePokemon._id);
+      const result = await service.findById(mockPokemon._id);
+      expect(result).toEqual(mockPokemon);
+      expect(FakePokemonModel.findOne).toHaveBeenCalledWith({
+        _id: mockPokemon._id,
+      });
     });
 
     it('should throw NotFoundException if not found', async () => {
-      FakePokemonModel.findById.mockReturnValue({
+      FakePokemonModel.findOne.mockReturnValue({
         exec: jest.fn().mockResolvedValue(null),
       });
       await expect(service.findById(999)).rejects.toThrow(NotFoundException);
@@ -105,10 +106,10 @@ describe('PokemonService', () => {
   describe('findByName', () => {
     it('should return a pokemon if found by name', async () => {
       FakePokemonModel.findOne.mockReturnValue({
-        exec: jest.fn().mockResolvedValue(fakePokemon),
+        exec: jest.fn().mockResolvedValue(mockPokemon),
       });
       const result = await service.findByName('bulbasaur');
-      expect(result).toEqual(fakePokemon);
+      expect(result).toEqual(mockPokemon);
       expect(FakePokemonModel.findOne).toHaveBeenCalledWith({
         name: { $regex: 'bulbasaur', $options: 'i' },
       });
@@ -130,10 +131,10 @@ describe('PokemonService', () => {
       FakePokemonModel.find = jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([fakePokemon]),
+        exec: jest.fn().mockResolvedValue([mockPokemon]),
       });
       const result = await service.findAll({});
-      expect(result).toEqual([fakePokemon]);
+      expect(result).toEqual([mockPokemon]);
       expect(FakePokemonModel.find).toHaveBeenCalledWith({});
     });
 
@@ -141,10 +142,10 @@ describe('PokemonService', () => {
       FakePokemonModel.find = jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([fakePokemon]),
+        exec: jest.fn().mockResolvedValue([mockPokemon]),
       });
       const result = await service.findAll({ name: 'bulb' });
-      expect(result).toEqual([fakePokemon]);
+      expect(result).toEqual([mockPokemon]);
       expect(FakePokemonModel.find).toHaveBeenCalledWith({
         name: { $regex: 'bulb', $options: 'i' },
       });
@@ -154,10 +155,10 @@ describe('PokemonService', () => {
       FakePokemonModel.find = jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([fakePokemon]),
+        exec: jest.fn().mockResolvedValue([mockPokemon]),
       });
       const result = await service.findAll({ type: 'Grass,Poison' });
-      expect(result).toEqual([fakePokemon]);
+      expect(result).toEqual([mockPokemon]);
       expect(FakePokemonModel.find).toHaveBeenCalledWith({
         types: { $in: ['Grass', 'Poison'] },
       });
@@ -167,10 +168,10 @@ describe('PokemonService', () => {
       FakePokemonModel.find = jest.fn().mockReturnValue({
         skip: jest.fn().mockReturnThis(),
         limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([fakePokemon]),
+        exec: jest.fn().mockResolvedValue([mockPokemon]),
       });
       const result = await service.findAll({ page: 2, limit: 5 });
-      expect(result).toEqual([fakePokemon]);
+      expect(result).toEqual([mockPokemon]);
     });
   });
 
@@ -187,8 +188,8 @@ describe('PokemonService', () => {
 
   describe('create', () => {
     it('should create and return a pokemon', async () => {
-      const result = await service.create(fakePokemon);
-      expect(result).toEqual(fakePokemon);
+      const result = await service.create(mockPokemon);
+      expect(result).toEqual(mockPokemon);
     });
   });
 });

@@ -1,4 +1,13 @@
-import { Controller, Get, Query, Param, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Query,
+  Param,
+  Post,
+  Body,
+  UseGuards,
+} from '@nestjs/common';
+import { AuthGuard } from '../auth.guard';
 import { PokemonService } from './pokemon.service';
 import { Pokemon } from './pokemon.interface';
 
@@ -7,6 +16,7 @@ export class PokemonController {
   constructor(private readonly pokemonService: PokemonService) {}
 
   @Get('search')
+  @UseGuards(AuthGuard)
   async getPokemons(
     @Query()
     query: {
