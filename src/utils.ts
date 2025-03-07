@@ -1,5 +1,5 @@
 import { NotFoundException } from '@nestjs/common';
-import { Model } from 'mongoose';
+import { FilterQuery, Model } from 'mongoose';
 
 /**
  * Finds a document using the provided Mongoose model and query.
@@ -7,14 +7,14 @@ import { Model } from 'mongoose';
  *
  * @template T - The type of the document.
  * @param model - The Mongoose model to query.
- * @param query - A partial query object to find the document.
+ * @param query - A query object to find the document.
  * @param notFoundMessage - The message to use if the document is not found.
  * @returns A promise that resolves with the found document.
  * @throws NotFoundException if no document is found.
  */
 export async function findOneOrThrow<T>(
   model: Model<T>,
-  query: Partial<T>,
+  query: FilterQuery<T>,
   notFoundMessage: string,
 ): Promise<T> {
   const doc = await model.findOne(query).exec();

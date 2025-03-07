@@ -22,54 +22,52 @@ describe('PokemonController (e2e)', () => {
     await app.close();
   });
 
-  it('GET /pokemons/:id should return a pokemon if it exists', async () => {
+  it('GET /pokemons/id/:id should return a pokemon if it exists', async () => {
     await request(app.getHttpServer())
-      .get(`/pokemons/1`)
+      .get(`/pokemons/id/1`)
       .expect(200)
       .expect((res) => {
         expect(res.body).toHaveProperty('name', 'Bulbasaur');
       });
   });
 
-  it('GET /pokemons/:id should return 404 for non-existent pokemon', async () => {
-    await request(app.getHttpServer()).get('/pokemons/999').expect(404);
+  it('GET /pokemons/id/:id should return 404 for non-existent pokemon', async () => {
+    await request(app.getHttpServer()).get('/pokemons/id/999').expect(404);
   });
 
-  it('GET /pokemons?name should return a pokemon if it is found', async () => {
+  it('GET /pokemons/name/:name should return a pokemon if it is found', async () => {
     await request(app.getHttpServer())
-      .get('/pokemons?name=bulbasaur')
+      .get('/pokemons/name/bulbasaur')
       .expect(200)
       .expect((res) => {
         expect(res.body).toHaveProperty('name', 'Bulbasaur');
       });
   });
 
-  it('GET /pokemons/search should fail without authentication', async () => {
-    const res = await request(app.getHttpServer())
-      .get('/pokemons/search')
-      .expect(401);
+  it('GET /pokemons should fail without authentication', async () => {
+    const res = await request(app.getHttpServer()).get('/pokemons').expect(401);
     expect(res.unauthorized).toBeTruthy();
   });
 
-  it('GET /pokemons/search should fail with incorrect password', async () => {
+  it('GET /pokemons should fail with incorrect password', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pokemons/search')
+      .get('/pokemons')
       .set('Authorization', 'Bearer user:wrongpassword')
       .expect(401);
     expect(res.unauthorized).toBeTruthy();
   });
 
-  it('GET /pokemons/search should return a paginated list', async () => {
+  it('GET /pokemons?page=1&limit=10 should return a paginated list', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pokemons/search?page=1&limit=10')
+      .get('/pokemons?page=1&limit=10')
       .set('Authorization', authHeader)
       .expect(200);
     expect(Array.isArray(res.body)).toBeTruthy();
   });
 
-  it('GET /pokemons/search?name=bulb should return filtered results by name', async () => {
+  it('GET /pokemons?name=bulb should return filtered results by name', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pokemons/search?name=bulb')
+      .get('/pokemons?name=bulb')
       .set('Authorization', authHeader)
       .expect(200);
     (res.body as Pokemon[]).forEach((pokemon: Pokemon) => {
@@ -77,15 +75,28 @@ describe('PokemonController (e2e)', () => {
     });
   });
 
-  it('GET /pokemons/search?type=Grass,Poison should return pokemons matching either type', async () => {
+  it('GET /pokemons?type=Grass,Poison should return pokemons matching either type', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pokemons/search?type=Grass,Poison')
+      .get('/pokemons?type=Grass,Poison')
       .set('Authorization', authHeader)
       .expect(200);
     (res.body as Pokemon[]).forEach((pokemon: Pokemon) => {
       // Check that at least one type is in the allowed list.
       const types: string[] = pokemon.types;
       expect(types.includes('Grass') || types.includes('Poison')).toBe(true);
+    });
+  });
+
+  it('GET /pokemons?favoritesOnly=true should return only favorite pokemons of authenticated user', async () => {
+    const res = await request(app.getHttpServer())
+      .get('/pokemons?favoritesOnly=true')
+      .set('Authorization', authHeader)
+      .expect(200);
+    const favorites = [1, 2, 3];
+    const pokemons = res.body as Pokemon[];
+    expect(favorites.length >= pokemons.length).toBe(true);
+    pokemons.forEach((pokemon) => {
+      expect([1, 2, 3].includes(pokemon._id)).toBe(true);
     });
   });
 

@@ -13,7 +13,7 @@ import {
   ApiResponse,
   ApiTags,
   ApiParam,
-  ApiBody,
+  //ApiBody,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
 import { User as UserDecorator } from './user.decorator';
@@ -85,7 +85,7 @@ export class UserController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
-  @ApiBody({ type: UserDecorator })
+  //@ApiBody({ type: User })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request. Invalid user data.' })
   async createUser(@Body() userData: User): Promise<User> {

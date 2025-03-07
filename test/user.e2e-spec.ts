@@ -7,7 +7,7 @@ import { Model } from 'mongoose';
 import { Server } from 'net';
 import { AppModule } from '../src/app.module';
 import { UserDocument, UserEntity } from '../src/schemas/user.schema';
-import { User, UserFavoritesResponse } from 'src/user/user.interface';
+import { User, UserFavoritesResponse } from '../src/user/user.interface';
 
 describe('UserController (e2e)', () => {
   let app: INestApplication<Server>;
