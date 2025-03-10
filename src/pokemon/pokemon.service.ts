@@ -3,21 +3,11 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { PokemonEntity, PokemonDocument } from '../schemas/pokemon.schema';
 import { Pokemon } from './pokemon.interface';
-import { PokemonType } from './pokemon-type.enum';
 import { findOneOrThrow } from '../utils';
 import { AuthenticatedUser } from '../user/user.interface';
 import { UserService } from '../user/user.service';
-
-/**
- * Query parameters for retrieving a list of Pokémon.
- */
-interface FindAllQuery {
-  page?: number;
-  limit?: number;
-  name?: string;
-  type?: string;
-  favoritesOnly?: string;
-}
+import { QueryPokemonDto } from './dto/query-pokemon.dto';
+import { CreatePokemonDto } from './dto/create-pokemon.dto';
 
 /**
  * MongoDB filter interface for searching Pokémon.
@@ -89,7 +79,7 @@ export class PokemonService {
    * @returns A promise that resolves to an array of Pokémon.
    */
   async findAll(
-    query: FindAllQuery,
+    query: QueryPokemonDto,
     user: AuthenticatedUser,
   ): Promise<Pokemon[]> {
     const page = query.page ?? 1;
@@ -110,16 +100,14 @@ export class PokemonService {
     }
 
     // Filter by types if provided
-    if (query.type) {
-      const types: PokemonType[] = query.type
-        .split(',')
-        .map((t) => t.trim() as PokemonType);
-      filter.types = { $in: types };
+    if (query.types) {
+      filter.types = { $in: query.types };
     }
 
     const skip = (page - 1) * limit;
     const pokemons = await this.pokemonModel
       .find(filter)
+      .sort({ _id: 1 })
       .skip(skip)
       .limit(limit)
       .exec();
@@ -141,7 +129,7 @@ export class PokemonService {
    * @param pokemonData - The data for the new Pokémon.
    * @returns A promise that resolves to the created Pokémon.
    */
-  async create(pokemonData: Pokemon): Promise<Pokemon> {
+  async create(pokemonData: CreatePokemonDto): Promise<Pokemon> {
     const createdPokemon = new this.pokemonModel(pokemonData);
     return createdPokemon.save();
   }

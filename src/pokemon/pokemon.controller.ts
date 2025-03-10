@@ -6,6 +6,7 @@ import {
   Post,
   Body,
   UseGuards,
+  ParseIntPipe,
 } from '@nestjs/common';
 import {
   ApiTags,
@@ -13,13 +14,15 @@ import {
   ApiResponse,
   ApiParam,
   ApiQuery,
-  //ApiBody,
+  ApiBody,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
 import { PokemonService } from './pokemon.service';
 import { Pokemon } from './pokemon.interface';
 import { User } from '../user/user.decorator';
 import { AuthenticatedUser } from '../user/user.interface';
+import { CreatePokemonDto } from './dto/create-pokemon.dto';
+import { QueryPokemonDto } from './dto/query-pokemon.dto';
 
 /**
  * Controller for managing Pokémon endpoints.
@@ -59,8 +62,15 @@ export class PokemonController {
     description: 'The unique identifier of the Pokémon',
   })
   @ApiResponse({ status: 200, description: 'Pokémon retrieved successfully.' })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request; e.g. Validation failed.',
+  })
+  @ApiResponse({ status: 404, description: 'Pokemon with given id not found.' })
   @Get('/id/:id')
-  async getPokemonById(@Param('id') id: number): Promise<Pokemon> {
+  async getPokemonById(
+    @Param('id', ParseIntPipe) id: number,
+  ): Promise<Pokemon> {
     return this.pokemonService.findById(id);
   }
 
@@ -78,6 +88,10 @@ export class PokemonController {
     description: 'The exact name of the Pokémon',
   })
   @ApiResponse({ status: 200, description: 'Pokémon retrieved successfully.' })
+  @ApiResponse({
+    status: 404,
+    description: 'Pokemon with given name not found.',
+  })
   @Get('/name/:name')
   async getPokemonByName(@Param('name') name: string): Promise<Pokemon> {
     return this.pokemonService.findByName(name);
@@ -136,18 +150,15 @@ export class PokemonController {
     status: 200,
     description: 'List of Pokémon retrieved successfully.',
   })
+  @ApiResponse({
+    status: 400,
+    description: 'Bad request - e.g. validation failed',
+  })
   @Get()
   @UseGuards(AuthGuard)
   async getPokemons(
     @User() user: AuthenticatedUser,
-    @Query()
-    query: {
-      page?: number;
-      limit?: number;
-      name?: string;
-      types?: string;
-      favoritesOnly?: string;
-    },
+    @Query() query: QueryPokemonDto,
   ): Promise<Pokemon[]> {
     return this.pokemonService.findAll(query, user);
   }
@@ -160,10 +171,10 @@ export class PokemonController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a new Pokémon' })
-  //@ApiBody({ type: Pokemon })
+  @ApiBody({ type: CreatePokemonDto })
   @ApiResponse({ status: 201, description: 'Pokémon created successfully.' })
   @Post()
-  async createPokemon(@Body() pokemonData: Pokemon): Promise<Pokemon> {
+  async createPokemon(@Body() pokemonData: CreatePokemonDto): Promise<Pokemon> {
     return this.pokemonService.create(pokemonData);
   }
 }

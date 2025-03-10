@@ -32,4 +32,11 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'warn'
     },
   },
+  {
+    // Specific configuration for DTO files
+    files: ['src/**/dto/*dto.ts'],
+    rules: {
+      '@typescript-eslint/no-unsafe-call': 'off',
+    },
+  },
 );
