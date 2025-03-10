@@ -4,6 +4,7 @@ import { Model } from 'mongoose';
 import { User } from './user.interface';
 import { UserEntity, UserDocument } from '../schemas/user.schema';
 import { findOneOrThrow } from '../utils';
+import { CreateUserDto } from './dto/create-user.dto';
 
 @Injectable()
 export class UserService {
@@ -56,7 +57,7 @@ export class UserService {
       { username },
       `User with name ${username} not found`,
     );
-    return user.favorites || [];
+    return user.favorites;
   }
 
   /**
@@ -91,7 +92,7 @@ export class UserService {
    * @param userData - The data of the user to be created.
    * @returns The newly created user.
    */
-  async create(userData: User): Promise<User> {
+  async create(userData: CreateUserDto): Promise<User> {
     const createdUser = new this.userModel(userData);
     return createdUser.save();
   }

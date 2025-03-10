@@ -19,6 +19,7 @@ import { AuthGuard } from '../auth.guard';
 import { User as UserDecorator } from './user.decorator';
 import { UserService } from './user.service';
 import { AuthenticatedUser, User } from './user.interface';
+import { CreateUserDto } from './dto/create-user.dto';
 
 /**
  * Controller responsible for handling user-related requests
@@ -88,7 +89,7 @@ export class UserController {
   //@ApiBody({ type: User })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request. Invalid user data.' })
-  async createUser(@Body() userData: User): Promise<User> {
+  async createUser(@Body() userData: CreateUserDto): Promise<User> {
     return this.userService.create(userData);
   }
 }
