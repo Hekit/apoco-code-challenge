@@ -75,9 +75,9 @@ describe('PokemonController (e2e)', () => {
     });
   });
 
-  it('GET /pokemons?type=Grass,Poison should return pokemons matching either type', async () => {
+  it('GET /pokemons?types=Grass,Poison should return pokemons matching either type', async () => {
     const res = await request(app.getHttpServer())
-      .get('/pokemons?type=Grass,Poison')
+      .get('/pokemons?types=Grass,Poison')
       .set('Authorization', authHeader)
       .expect(200);
     (res.body as Pokemon[]).forEach((pokemon: Pokemon) => {
