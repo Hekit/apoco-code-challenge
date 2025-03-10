@@ -1,23 +1,79 @@
-services:
-  app:
-    build: .
-    ports:
-      - '3000:3000'
-    depends_on:
-      - mongo
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/apoco-code-challenge
-    volumes:
-      - .:/app
-    command: yarn start:dev
+version: '2.4'
 
+services:
   mongo:
     image: mongo:5
     restart: always
+    command: ["mongod", "--quiet"]
     ports:
       - '27017:27017'
     volumes:
       - mongo-data:/data/db
+    healthcheck:
+      test: ["CMD", "mongo", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  seed:
+    image: apoco-code-challenge:seeder
+    build:
+      context: .
+      target: seeder
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/apoco-code-challenge
+    command: ["node", "dist/seeds/seed.js"]
+    restart: "no"
+    healthcheck:
+      test: ["CMD", "echo", "seeded"]
+      interval: 1s
+      timeout: 1s
+      retries: 1
+
+  app:
+    image: apoco-code-challenge:prod
+    build:
+      context: .
+      target: production
+    ports:
+      - '3000:3000'
+    depends_on:
+      mongo:
+        condition: service_healthy
+      seed:
+        condition: service_completed_successfully
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/apoco-code-challenge
+    healthcheck:
+      test: ["CMD", "node", "dist/healthcheck.js"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  # One-off service for unit tests
+  test-unit:
+    build:
+      context: .
+      target: tester
+    image: apoco-code-challenge:tester
+    command: yarn test
+
+  # One-off service for end-to-end tests
+  test-e2e:
+    build:
+      context: .
+      target: e2e
+    image: apoco-code-challenge:e2e
+    depends_on:
+      mongo:
+        condition: service_healthy
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/apoco-code-challenge
+    volumes:
+      - ./test-results:/test-results
 
 volumes:
   mongo-data:

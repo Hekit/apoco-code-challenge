@@ -1,23 +1,28 @@
-# Use an official Node runtime as a parent image
-FROM node:22
-
-# Set the working directory
+# Install dependencies and build the application
+FROM node:22 AS builder
 WORKDIR /app
-
-# Copy package.json and yarn.lock files first (for caching dependencies)
 COPY package.json yarn.lock ./
-
-# Install dependencies
 RUN yarn install --frozen-lockfile
-
-# Copy the rest of your source code
 COPY . .
-
-# Build the NestJS application
 RUN yarn build
 
-# Expose the port the app runs on
-EXPOSE 3000
+# Run unit tests
+FROM builder AS tester
+RUN yarn test
 
-# Define the command to run your app
-CMD ["node", "dist/main.js"]
+# Run end-to-end tests
+FROM builder AS e2e
+CMD ["yarn", "test:e2e"]
+
+# Image for production
+FROM node:22 AS production
+WORKDIR /app
+COPY package.json yarn.lock ./
+RUN yarn install --frozen-lockfile --production
+COPY --from=builder /app/dist ./dist
+EXPOSE 3000
+CMD ["node", "dist/src/main.js"]
+
+# Seeder – runs the seed script
+FROM production AS seeder
+CMD ["node", "dist/seeds/seed.js"]
