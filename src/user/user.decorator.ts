@@ -11,11 +11,12 @@ import { AuthenticatedUser } from './user.interface';
  * @param ctx The execution context providing access to the request.
  * @returns The authenticated user extracted from the request.
  */
-export const User = createParamDecorator(
-  (data: unknown, ctx: ExecutionContext): AuthenticatedUser => {
-    const request = ctx
-      .switchToHttp()
-      .getRequest<{ user: AuthenticatedUser }>();
-    return request.user;
-  },
-);
+export const userFactory = (
+  data: unknown,
+  ctx: ExecutionContext,
+): AuthenticatedUser => {
+  const request = ctx.switchToHttp().getRequest<{ user: AuthenticatedUser }>();
+  return request.user;
+};
+
+export const User = createParamDecorator(userFactory);

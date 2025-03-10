@@ -1,8 +1,8 @@
 import { Test, TestingModule } from '@nestjs/testing';
-import { PokemonService } from './pokemon.service';
 import { getModelToken } from '@nestjs/mongoose';
-import { PokemonEntity } from '../schemas/pokemon.schema';
 import { NotFoundException } from '@nestjs/common';
+import { PokemonService } from './pokemon.service';
+import { PokemonEntity } from '../schemas/pokemon.schema';
 import { Pokemon } from './pokemon.interface';
 import { PokemonType } from './pokemon-type.enum';
 import { AuthenticatedUser, User } from '../user/user.interface';
@@ -148,24 +148,21 @@ describe('PokemonService', () => {
   });
 
   describe('findAll', () => {
+    FakePokemonModel.find = jest.fn().mockReturnValue({
+      skip: jest.fn().mockReturnThis(),
+      sort: jest.fn().mockReturnThis(),
+      limit: jest.fn().mockReturnThis(),
+      exec: jest.fn().mockResolvedValue([mockPokemon]),
+    });
+
     it('should return all pokemons without filters', async () => {
       // Assign a static "find" method for findAll.
-      FakePokemonModel.find = jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([mockPokemon]),
-      });
       const result = await service.findAll({}, mockUserWithFavorites);
       expect(result).toEqual([mockPokemon]);
       expect(FakePokemonModel.find).toHaveBeenCalledWith({});
     });
 
     it('should filter by name (case-insensitive)', async () => {
-      FakePokemonModel.find = jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([mockPokemon]),
-      });
       const result = await service.findAll(
         { name: 'bulb' },
         mockUserWithFavorites,
@@ -177,13 +174,8 @@ describe('PokemonService', () => {
     });
 
     it('should filter by multiple types', async () => {
-      FakePokemonModel.find = jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([mockPokemon]),
-      });
       const result = await service.findAll(
-        { type: 'Grass,Poison' },
+        { types: [PokemonType.Grass, PokemonType.Poison] },
         mockUserWithFavorites,
       );
       expect(result).toEqual([mockPokemon]);
@@ -193,16 +185,26 @@ describe('PokemonService', () => {
     });
 
     it('should paginate results', async () => {
-      FakePokemonModel.find = jest.fn().mockReturnValue({
-        skip: jest.fn().mockReturnThis(),
-        limit: jest.fn().mockReturnThis(),
-        exec: jest.fn().mockResolvedValue([mockPokemon]),
-      });
       const result = await service.findAll(
         { page: 2, limit: 5 },
         mockUserWithFavorites,
       );
       expect(result).toEqual([mockPokemon]);
+    });
+
+    it('should return favorites only', async () => {
+      jest
+        .spyOn(service['userService'], 'getFavoritesForUser')
+        .mockResolvedValue([mockPokemon._id]);
+
+      const result = await service.findAll(
+        { favoritesOnly: 'true' },
+        mockUserWithFavorites,
+      );
+      expect(result).toEqual([mockPokemon]);
+      expect(FakePokemonModel.find).toHaveBeenCalledWith({
+        _id: { $in: [mockPokemon._id] },
+      });
     });
   });
 
