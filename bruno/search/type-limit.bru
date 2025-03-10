@@ -5,12 +5,13 @@ meta {
 }
 
 get {
-  url: http://localhost:3000/pokemons?type=Grass,Water&limit=20
+  url: http://localhost:3000/pokemons?types=Grass,Water&limit=20&page=2
   body: none
   auth: inherit
 }
 
 params:query {
-  type: Grass,Water
+  types: Grass,Water
   limit: 20
+  page: 2
 }
