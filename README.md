@@ -20,7 +20,13 @@ git, Node.js, yarn, TypeScript, Docker, Jest, Swagger, MongoDB, Mongoose, NestJS
 
 ## Authentication
 
-For the sake of not overengineering it I am treating `username:password` as a token. The dabatase looks like I would assume it might look in a real use case - it has a username and a password. In such a use case, the password would be a hash, not plain text, it would be checked just once and a token would be issued that would then be used for authentication. 
+For the sake of not overengineering it I am treating `username:password` as a token. The dabatase looks like I would assume it might look in a real use case - it has a username and a password. In such a use case, the password would be a hash, not plain text, it would be checked just once and a token would be issued that would then be used for authentication.
+
+### Where is it applied
+
+Intentionally this authentication happens only on some of the endpoints. I was thinking along the way that the basic pokemon catalogue (find by ID, find by exact name match and getting the types) might be public but advanced features would accessible only to authenticated users.
+
+It could easily be argued that creating new users and pokemons endpoints shouldn't be accessible without authentication (or at all). Indeed, but since the authentication was supposed to be more of a draft than overengineered I felt like this falls into the same category.
 
 ## A note on Bruno
 

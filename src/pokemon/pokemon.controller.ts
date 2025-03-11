@@ -15,6 +15,7 @@ import {
   ApiParam,
   ApiQuery,
   ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
 import { PokemonService } from './pokemon.service';
@@ -112,6 +113,7 @@ export class PokemonController {
    * @returns An array of Pokémon.
    */
   @Get()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Get a paginated list of Pokémon with optional filtering',
@@ -155,6 +157,7 @@ export class PokemonController {
     description: 'Bad request - e.g. validation failed',
   })
   @Get()
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   async getPokemons(
     @User() user: AuthenticatedUser,

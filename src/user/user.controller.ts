@@ -13,7 +13,8 @@ import {
   ApiResponse,
   ApiTags,
   ApiParam,
-  //ApiBody,
+  ApiBody,
+  ApiBearerAuth,
 } from '@nestjs/swagger';
 import { AuthGuard } from '../auth.guard';
 import { User as UserDecorator } from './user.decorator';
@@ -40,6 +41,7 @@ export class UserController {
    * @returns The updated user record.
    */
   @Patch('/favorites/:id')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiOperation({
     summary: 'Toggle a favorite item for the authenticated user',
@@ -65,6 +67,7 @@ export class UserController {
    * @returns An array of favorite item IDs.
    */
   @Get('/favorites')
+  @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @ApiOperation({ summary: "Get the authenticated user's favorites" })
   @ApiResponse({
@@ -86,7 +89,7 @@ export class UserController {
    */
   @Post()
   @ApiOperation({ summary: 'Create a new user' })
-  //@ApiBody({ type: User })
+  @ApiBody({ type: CreateUserDto })
   @ApiResponse({ status: 201, description: 'User created successfully.' })
   @ApiResponse({ status: 400, description: 'Bad Request. Invalid user data.' })
   async createUser(@Body() userData: CreateUserDto): Promise<User> {
